@@ -20,5 +20,6 @@ from django.urls import include, path  # Убедитесь, что include им
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('news/', include('news.urls')),  # Эта строка подключает URL-конфигурации вашего приложения news
+path('accounts/', include('allauth.urls')),
 ]
 
