@@ -39,13 +39,13 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "news",
     "accounts",
-'django_filters',
-'django.contrib.sites',
+    "django_filters",
+    "django.contrib.sites",
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.yandex',
-
+    'django_apscheduler',
 ]
 
 SITE_ID = 1
@@ -145,3 +145,17 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# Email settings
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_HOST = 'smtp.example.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'your_email@example.com'
+EMAIL_HOST_PASSWORD = 'your_password'
+EMAIL_USE_TLS = True
+DEFAULT_FROM_EMAIL = 'your_email@example.com'
+
+# django-apscheduler settings
+APSCHEDULER_DATETIME_FORMAT = "N j, Y, f:s a"
+APSCHEDULER_RUN_NOW_TIMEOUT = 25  # Seconds
+

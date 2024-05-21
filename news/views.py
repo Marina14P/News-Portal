@@ -6,6 +6,11 @@ from .models import Post  # Использууется модель Post
 from .filters import PostFilter
 from django.utils import timezone
 
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect
+from .forms import SubscriptionForm
+from .models import Subscriber
+
 def index(request):
     latest_articles = Post.objects.filter(post_type='article').order_by('-pub_date')[:10]
     return render(request, 'news/index.html', {'latest_articles': latest_articles})
@@ -59,3 +64,17 @@ class PostDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     template_name = 'news/post_confirm_delete.html'
     success_url = reverse_lazy('post_list')
     permission_required = ('news.delete_post',)
+
+
+@login_required
+def subscribe(request):
+    if request.method == 'POST':
+        form = SubscriptionForm(request.POST, user=request.user)
+        if form.is_valid():
+            subscription = form.save(commit=False)
+            subscription.user = request.user
+            subscription.save()
+            return redirect('subscriptions')
+    else:
+        form = SubscriptionForm(user=request.user)
+    return render(request, 'news/subscriptions.html', {'form': form})
