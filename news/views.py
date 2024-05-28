@@ -2,9 +2,11 @@ from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMix
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
-from .models import Post  # Использууется модель Post
+from .models import Post  # Используется модель Post
 from .filters import PostFilter
 from django.utils import timezone
+
+from .tasks import send_new_post_notification  # использование Celery для рассылки уведомлений
 
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
@@ -39,6 +41,8 @@ class PostCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
         post = form.save(commit=False)
         post.post_type = 'news'
         post.pub_date = timezone.now()
+        post.save()
+        send_new_post_notification.delay(post.id)  # Запуск задачи Celery
         return super().form_valid(form)
 
 class ArticleCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
@@ -51,6 +55,8 @@ class ArticleCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView)
         post = form.save(commit=False)
         post.post_type = 'article'
         post.pub_date = timezone.now()
+        post.save()
+        send_new_post_notification.delay(post.id)  # Запуск задачи Celery
         return super().form_valid(form)
 
 class PostUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
